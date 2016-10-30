@@ -21485,6 +21485,7 @@
 	  _createClass(Root, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
+	      this.handleTabCount();
 	      _tab_store2.default.addChangeListener(this.handleTabCount);
 	    }
 	  }, {
@@ -21580,10 +21581,10 @@
 	var TabModal = function (_React$Component) {
 	  _inherits(TabModal, _React$Component);
 	
-	  function TabModal(props) {
+	  function TabModal() {
 	    _classCallCheck(this, TabModal);
 	
-	    var _this = _possibleConstructorReturn(this, (TabModal.__proto__ || Object.getPrototypeOf(TabModal)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (TabModal.__proto__ || Object.getPrototypeOf(TabModal)).call(this));
 	
 	    _this.state = {
 	      tab: null,
@@ -21592,7 +21593,7 @@
 	    };
 	    _this.handleDestroyTab = _this.handleDestroyTab.bind(_this);
 	    _this.handleCreateTab = _this.handleCreateTab.bind(_this);
-	    _this.handleChangeTab = _this.handleChangeTab.bind(_this);
+	    _this.fetchStoreState = _this.fetchStoreState.bind(_this);
 	    _this.updateTabInfo = _this.updateTabInfo.bind(_this);
 	    return _this;
 	  }
@@ -21600,18 +21601,18 @@
 	  _createClass(TabModal, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      this.handleChangeTab();
-	      _tab_store2.default.addChangeListener(this.handleChangeTab);
+	      this.fetchStoreState();
+	      _tab_store2.default.addChangeListener(this.fetchStoreState);
 	    }
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
 	      this.updateTabInfo();
-	      _tab_store2.default.removeChangeListener(this.handleChangeTab);
+	      _tab_store2.default.removeChangeListener(this.fetchStoreState);
 	    }
 	  }, {
-	    key: 'handleChangeTab',
-	    value: function handleChangeTab() {
+	    key: 'fetchStoreState',
+	    value: function fetchStoreState() {
 	      var _TabStore$getState = _tab_store2.default.getState(),
 	          tab = _TabStore$getState.tab,
 	          tabs = _TabStore$getState.tabs;
@@ -21624,17 +21625,15 @@
 	      this.setState(newState);
 	    }
 	  }, {
+	    key: 'updateTabInfo',
+	    value: function updateTabInfo() {
+	      (0, _tab_actions.updateTab)({ id: this.state.tab, body: this.state.input });
+	    }
+	  }, {
 	    key: 'handleCreateTab',
 	    value: function handleCreateTab() {
 	      this.updateTabInfo();
 	      (0, _tab_actions.createTab)();
-	    }
-	  }, {
-	    key: 'updateTabInfo',
-	    value: function updateTabInfo() {
-	      if (this.state.tab) {
-	        (0, _tab_actions.updateTab)({ id: this.state.tab, body: this.state.input });
-	      }
 	    }
 	  }, {
 	    key: 'handleDestroyTab',
@@ -21670,8 +21669,7 @@
 	            );
 	          } else {
 	            return _react2.default.createElement(_tab_modal_item2.default, { id: key,
-	              tab: _this3.state.tab,
-	              input: _this3.state.input,
+	              updateTabInfo: _this3.updateTabInfo,
 	              key: key
 	            });
 	          }
@@ -21771,18 +21769,24 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var CHANGE_EVENT = 'change';
+	var DEFAULT_STORAGE = {
+	  tab: null,
+	  tabs: {}
+	};
 	
 	var TabStore = function (_EventEmitter) {
 	  _inherits(TabStore, _EventEmitter);
 	
 	  function TabStore() {
+	    var storage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_STORAGE;
+	
 	    _classCallCheck(this, TabStore);
 	
 	    var _this = _possibleConstructorReturn(this, (TabStore.__proto__ || Object.getPrototypeOf(TabStore)).call(this));
 	
 	    _this.state = {
-	      tab: null,
-	      tabs: {}
+	      tab: storage.tab,
+	      tabs: storage.tabs
 	    };
 	    return _this;
 	  }
@@ -21807,17 +21811,38 @@
 	    value: function removeChangeListener(callback) {
 	      this.removeListener(CHANGE_EVENT, callback);
 	    }
+	  }, {
+	    key: 'saveState',
+	    value: function saveState() {
+	      var _state = this.state,
+	          tab = _state.tab,
+	          tabs = _state.tabs;
+	
+	      var storage = {
+	        tab: tab,
+	        tabs: tabs
+	      };
+	      localStorage.setItem('tabStore', JSON.stringify(storage));
+	    }
 	  }]);
 	
 	  return TabStore;
 	}(_eventemitter2.default);
 	
-	var tabStore = new TabStore();
+	var tabStore = void 0;
+	var storage = JSON.parse(localStorage.getItem('tabStore'));
+	
+	if (storage.tab) {
+	  tabStore = new TabStore(storage);
+	} else {
+	  tabStore = new TabStore();
+	}
 	
 	tabStore.dispatchToken = _dispatcher2.default.register(function (action) {
 	  switch (action.type) {
 	    case _tab_actions.TabConstants.VIEW_TAB:
 	      tabStore.state.tab = parseInt(action.tab);
+	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.CREATE_TAB:
@@ -21826,16 +21851,21 @@
 	      var newKey = parseInt(lastKey) + 1;
 	      tabStore.state.tab = newKey;
 	      tabStore.state.tabs[newKey] = "";
+	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.DESTROY_TAB:
 	      delete tabStore.state.tabs[action.tab];
 	      tabStore.state.tab = null;
+	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.UPDATE_TAB:
-	      var updateTab = action.tab;
-	      tabStore.state.tabs[updateTab.id] = updateTab.body;
+	      if (action.tab.id) {
+	        var updateTab = action.tab;
+	        tabStore.state.tabs[updateTab.id] = updateTab.body;
+	        tabStore.saveState();
+	      }
 	      break;
 	    default:
 	      break;
@@ -22514,10 +22544,10 @@
 	var TabModalItem = function (_React$Component) {
 	  _inherits(TabModalItem, _React$Component);
 	
-	  function TabModalItem(props) {
+	  function TabModalItem() {
 	    _classCallCheck(this, TabModalItem);
 	
-	    var _this = _possibleConstructorReturn(this, (TabModalItem.__proto__ || Object.getPrototypeOf(TabModalItem)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (TabModalItem.__proto__ || Object.getPrototypeOf(TabModalItem)).call(this));
 	
 	    _this.handleViewTab = _this.handleViewTab.bind(_this);
 	    return _this;
@@ -22526,7 +22556,7 @@
 	  _createClass(TabModalItem, [{
 	    key: 'handleViewTab',
 	    value: function handleViewTab() {
-	      (0, _tab_actions.updateTab)({ id: this.props.tab, body: this.props.input });
+	      this.props.updateTabInfo();
 	      (0, _tab_actions.viewTab)(parseInt(this.props.id));
 	    }
 	  }, {

@@ -6,8 +6,8 @@ import { createTab,
 import TabModalItem from './tab_modal_item';
 
 class TabModal extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       tab: null,
       tabs: {},
@@ -15,23 +15,23 @@ class TabModal extends React.Component {
     };
     this.handleDestroyTab = this.handleDestroyTab.bind(this);
     this.handleCreateTab = this.handleCreateTab.bind(this);
-    this.handleChangeTab = this.handleChangeTab.bind(this);
+    this.fetchStoreState = this.fetchStoreState.bind(this);
     this.updateTabInfo = this.updateTabInfo.bind(this);
   }
 
   componentDidMount() {
-    this.handleChangeTab();
-    TabStore.addChangeListener(this.handleChangeTab);
+    this.fetchStoreState();
+    TabStore.addChangeListener(this.fetchStoreState);
   }
 
   componentWillUnmount() {
     this.updateTabInfo();
-    TabStore.removeChangeListener(this.handleChangeTab);
+    TabStore.removeChangeListener(this.fetchStoreState);
   }
 
-  handleChangeTab() {
+  fetchStoreState() {
     const { tab, tabs } = TabStore.getState();
-    let newState = {
+    const newState = {
       tab,
       tabs,
       input: tabs[tab]
@@ -39,15 +39,13 @@ class TabModal extends React.Component {
     this.setState(newState);
   }
 
+  updateTabInfo() {
+    updateTab({ id: this.state.tab, body: this.state.input });
+  }
+
   handleCreateTab() {
     this.updateTabInfo();
     createTab();
-  }
-
-  updateTabInfo() {
-    if (this.state.tab) {
-      updateTab({ id: this.state.tab, body: this.state.input });
-    }
   }
 
   handleDestroyTab() {
@@ -70,8 +68,7 @@ class TabModal extends React.Component {
                    </div>;
           } else {
             return <TabModalItem id={key}
-                                 tab={this.state.tab}
-                                 input={this.state.input}
+                                 updateTabInfo={this.updateTabInfo}
                                  key={key}
                    />;
           }

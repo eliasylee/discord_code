@@ -3,13 +3,13 @@ import { updateTab,
          viewTab } from '../../actions/tab_actions';
 
 class TabModalItem extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.handleViewTab = this.handleViewTab.bind(this);
   }
 
   handleViewTab() {
-    updateTab({ id: this.props.tab, body: this.props.input });
+    this.props.updateTabInfo();
     viewTab(parseInt(this.props.id));
   }
 

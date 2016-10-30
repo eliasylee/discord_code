@@ -15,6 +15,7 @@ class Root extends React.Component {
   }
 
   componentDidMount() {
+    this.handleTabCount();
     TabStore.addChangeListener(this.handleTabCount);
   }
 
