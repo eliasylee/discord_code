@@ -21774,27 +21774,24 @@
 	  tabs: {}
 	};
 	
+	var storage = JSON.parse(localStorage.getItem('tabStore'));
+	if (!storage.tabs) {
+	  storage = DEFAULT_STORAGE;
+	}
+	
 	var TabStore = function (_EventEmitter) {
 	  _inherits(TabStore, _EventEmitter);
 	
 	  function TabStore() {
-	    var storage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_STORAGE;
-	
 	    _classCallCheck(this, TabStore);
 	
-	    var _this = _possibleConstructorReturn(this, (TabStore.__proto__ || Object.getPrototypeOf(TabStore)).call(this));
-	
-	    _this.state = {
-	      tab: storage.tab,
-	      tabs: storage.tabs
-	    };
-	    return _this;
+	    return _possibleConstructorReturn(this, (TabStore.__proto__ || Object.getPrototypeOf(TabStore)).apply(this, arguments));
 	  }
 	
 	  _createClass(TabStore, [{
 	    key: 'getState',
 	    value: function getState() {
-	      return this.state;
+	      return storage;
 	    }
 	  }, {
 	    key: 'emitChange',
@@ -21814,14 +21811,6 @@
 	  }, {
 	    key: 'saveState',
 	    value: function saveState() {
-	      var _state = this.state,
-	          tab = _state.tab,
-	          tabs = _state.tabs;
-	
-	      var storage = {
-	        tab: tab,
-	        tabs: tabs
-	      };
 	      localStorage.setItem('tabStore', JSON.stringify(storage));
 	    }
 	  }]);
@@ -21829,43 +21818,38 @@
 	  return TabStore;
 	}(_eventemitter2.default);
 	
-	var tabStore = void 0;
-	var storage = JSON.parse(localStorage.getItem('tabStore'));
-	
-	if (storage.tabs) {
-	  tabStore = new TabStore(storage);
-	} else {
-	  tabStore = new TabStore();
-	}
+	var tabStore = new TabStore();
 	
 	tabStore.dispatchToken = _dispatcher2.default.register(function (action) {
 	  switch (action.type) {
 	    case _tab_actions.TabConstants.VIEW_TAB:
-	      tabStore.state.tab = parseInt(action.tab);
+	      storage.tab = action.tab;
 	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.CREATE_TAB:
-	      var keys = Object.keys(tabStore.state.tabs);
-	      var lastKey = keys[0] ? keys[keys.length - 1] : 0;
-	      var newKey = parseInt(lastKey) + 1;
-	      tabStore.state.tab = newKey;
-	      tabStore.state.tabs[newKey] = "";
+	      var keys = Object.keys(storage.tabs);
+	      var lastKey = parseInt(keys[keys.length - 1]);
+	      var newKey = lastKey + 1;
+	      storage.tab = newKey;
+	      storage.tabs[newKey] = "";
 	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.DESTROY_TAB:
-	      delete tabStore.state.tabs[action.tab];
-	      tabStore.state.tab = null;
+	      delete storage.tabs[action.tab];
+	      storage.tab = null;
 	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.UPDATE_TAB:
-	      if (action.tab.id) {
-	        var updateTab = action.tab;
-	        tabStore.state.tabs[updateTab.id] = updateTab.body;
-	        tabStore.saveState();
-	      }
+	      var _action$tab = action.tab,
+	          id = _action$tab.id,
+	          body = _action$tab.body;
+	
+	      storage.tab = id;
+	      storage.tabs[id] = body;
+	      tabStore.saveState();
 	      break;
 	    default:
 	      break;
