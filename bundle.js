@@ -21832,7 +21832,7 @@
 	var tabStore = void 0;
 	var storage = JSON.parse(localStorage.getItem('tabStore'));
 	
-	if (storage.tab) {
+	if (storage.tabs) {
 	  tabStore = new TabStore(storage);
 	} else {
 	  tabStore = new TabStore();

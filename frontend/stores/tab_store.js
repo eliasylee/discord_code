@@ -46,7 +46,7 @@ class TabStore extends EventEmitter {
 let tabStore;
 let storage = JSON.parse(localStorage.getItem('tabStore'));
 
-if (storage.tab) {
+if (storage.tabs) {
   tabStore = new TabStore(storage);
 } else {
   tabStore = new TabStore();
