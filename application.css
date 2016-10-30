@@ -1,0 +1,97 @@
+.splashPage {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+}
+
+.openButton {
+  height: 50px;
+  width: 150px;
+  border: 1px solid black;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabModal {
+  height: 80%;
+  width: 60%;
+  border: 1px solid black;
+  border-radius: 2px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.modalTop {
+  height: 90%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.closeModalButton {
+  height: 10%;
+  width: 100%;
+  border-top: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabIndex {
+  height: 100%;
+  width: 20%;
+  overflow-y: scroll;
+  border-right: 1px solid black;
+}
+
+.createTab, .singleTab, .viewedSingleTab {
+  height: 14%;
+  width: 50%;
+  margin: 5px auto;
+  border: 1px solid black;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.viewedSingleTab {
+  background-color: red;
+}
+
+.tabView {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tabViewBody {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.textArea {
+  height: 95%;
+  width: 95%;
+}
+
+.destroyTabButton {
+  height: 5%;
+  width: 100%;
+  border-top: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
