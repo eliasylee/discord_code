@@ -37,7 +37,9 @@ class Root extends React.Component {
     if (!this.state.view) {
       return (
         <div className="openButton"
-             onClick={this.toggleView}>Open ({this.state.count})</div>
+             onClick={this.toggleView}>
+             Open ({this.state.count})
+        </div>
       );
     }
   }
@@ -45,7 +47,7 @@ class Root extends React.Component {
   renderModal() {
     if (this.state.view) {
       return (
-        <TabModal toggleView={this.toggleView}/>
+        <TabModal toggleView={this.toggleView} />
       );
     }
   }

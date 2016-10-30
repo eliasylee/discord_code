@@ -16,7 +16,9 @@ class TabModalItem extends React.Component {
   render() {
     return (
       <div className="singleTab"
-           onClick={this.handleViewTab}>{this.props.id}</div>
+           onClick={this.handleViewTab}>
+           {this.props.id}
+      </div>
     );
   }
 }

@@ -16,6 +16,7 @@ class TabModal extends React.Component {
     this.handleDestroyTab = this.handleDestroyTab.bind(this);
     this.handleCreateTab = this.handleCreateTab.bind(this);
     this.handleChangeTab = this.handleChangeTab.bind(this);
+    this.updateTabInfo = this.updateTabInfo.bind(this);
   }
 
   componentDidMount() {
@@ -24,24 +25,29 @@ class TabModal extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.state.tab) {
-      updateTab({ id: this.state.tab, body: this.state.input });
-    }
+    this.updateTabInfo();
     TabStore.removeChangeListener(this.handleChangeTab);
   }
 
   handleChangeTab() {
-    let tabState = TabStore.getState();
+    const { tab, tabs } = TabStore.getState();
     let newState = {
-      tab: tabState.tab,
-      tabs: tabState.tabs,
-      input: tabState.tabs[tabState.tab]
+      tab,
+      tabs,
+      input: tabs[tab]
     };
     this.setState(newState);
   }
 
   handleCreateTab() {
+    this.updateTabInfo();
     createTab();
+  }
+
+  updateTabInfo() {
+    if (this.state.tab) {
+      updateTab({ id: this.state.tab, body: this.state.input });
+    }
   }
 
   handleDestroyTab() {
@@ -60,16 +66,20 @@ class TabModal extends React.Component {
         {keys.map( key => {
           if (parseInt(key) === viewedTab) {
             return <div className="viewedSingleTab"
-                        key={key}>{key}</div>;
+                        key={key}>{key}
+                   </div>;
           } else {
             return <TabModalItem id={key}
                                  tab={this.state.tab}
                                  input={this.state.input}
-                                 key={key} />;
+                                 key={key}
+                   />;
           }
         })}
         <div className="createTab"
-             onClick={this.handleCreateTab}>Create</div>
+             onClick={this.handleCreateTab}>
+             Create
+        </div>
       </div>
     );
   }
@@ -81,10 +91,13 @@ class TabModal extends React.Component {
           <div className="tabViewBody">
             <textarea className="textArea"
                       onChange={this.handleInput()}
-                      value={this.state.input}></textarea>
+                      value={this.state.input}>
+            </textarea>
           </div>
           <div className="destroyTabButton"
-               onClick={this.handleDestroyTab}>Destroy Tab</div>
+               onClick={this.handleDestroyTab}>
+               Destroy Tab
+          </div>
         </div>
       );
     } else {
@@ -100,7 +113,9 @@ class TabModal extends React.Component {
           {this.renderTabView()}
         </div>
         <div className="closeModalButton"
-             onClick={this.props.toggleView}>Close Modal</div>
+             onClick={this.props.toggleView}>
+             Close Modal
+        </div>
       </div>
     );
   }

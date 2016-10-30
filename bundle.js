@@ -21593,6 +21593,7 @@
 	    _this.handleDestroyTab = _this.handleDestroyTab.bind(_this);
 	    _this.handleCreateTab = _this.handleCreateTab.bind(_this);
 	    _this.handleChangeTab = _this.handleChangeTab.bind(_this);
+	    _this.updateTabInfo = _this.updateTabInfo.bind(_this);
 	    return _this;
 	  }
 	
@@ -21605,26 +21606,35 @@
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
-	      if (this.state.tab) {
-	        (0, _tab_actions.updateTab)({ id: this.state.tab, body: this.state.input });
-	      }
+	      this.updateTabInfo();
 	      _tab_store2.default.removeChangeListener(this.handleChangeTab);
 	    }
 	  }, {
 	    key: 'handleChangeTab',
 	    value: function handleChangeTab() {
-	      var tabState = _tab_store2.default.getState();
+	      var _TabStore$getState = _tab_store2.default.getState(),
+	          tab = _TabStore$getState.tab,
+	          tabs = _TabStore$getState.tabs;
+	
 	      var newState = {
-	        tab: tabState.tab,
-	        tabs: tabState.tabs,
-	        input: tabState.tabs[tabState.tab]
+	        tab: tab,
+	        tabs: tabs,
+	        input: tabs[tab]
 	      };
 	      this.setState(newState);
 	    }
 	  }, {
 	    key: 'handleCreateTab',
 	    value: function handleCreateTab() {
+	      this.updateTabInfo();
 	      (0, _tab_actions.createTab)();
+	    }
+	  }, {
+	    key: 'updateTabInfo',
+	    value: function updateTabInfo() {
+	      if (this.state.tab) {
+	        (0, _tab_actions.updateTab)({ id: this.state.tab, body: this.state.input });
+	      }
 	    }
 	  }, {
 	    key: 'handleDestroyTab',
@@ -21662,7 +21672,8 @@
 	            return _react2.default.createElement(_tab_modal_item2.default, { id: key,
 	              tab: _this3.state.tab,
 	              input: _this3.state.input,
-	              key: key });
+	              key: key
+	            });
 	          }
 	        }),
 	        _react2.default.createElement(
