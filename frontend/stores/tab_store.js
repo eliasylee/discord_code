@@ -39,11 +39,6 @@ const tabStore = new TabStore();
 
 tabStore.dispatchToken = Dispatcher.register(action => {
   switch (action.type) {
-    case TabConstants.VIEW_TAB:
-      storage.tab = action.tab;
-      tabStore.saveState();
-      tabStore.emitChange();
-      break;
     case TabConstants.CREATE_TAB:
       let keys = Object.keys(storage.tabs);
       let lastKey = parseInt(keys[keys.length - 1]);
@@ -54,16 +49,22 @@ tabStore.dispatchToken = Dispatcher.register(action => {
       tabStore.emitChange();
       break;
     case TabConstants.DESTROY_TAB:
-      delete storage.tabs[action.tab];
       storage.tab = null;
+      delete storage.tabs[action.tab];
+      tabStore.saveState();
+      tabStore.emitChange();
+      break;
+    case TabConstants.VIEW_TAB:
+      storage.tab = action.tab;
       tabStore.saveState();
       tabStore.emitChange();
       break;
     case TabConstants.UPDATE_TAB:
-      const { id, body } = action.tab;
-      storage.tab = id;
-      storage.tabs[id] = body;
-      tabStore.saveState();
+      if (action.id) {
+        const { id, body } = action.tab;
+        storage.tabs[id] = body;
+        tabStore.saveState();
+      }
       break;
     default:
       break;

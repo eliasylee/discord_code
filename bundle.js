@@ -21822,11 +21822,6 @@
 	
 	tabStore.dispatchToken = _dispatcher2.default.register(function (action) {
 	  switch (action.type) {
-	    case _tab_actions.TabConstants.VIEW_TAB:
-	      storage.tab = action.tab;
-	      tabStore.saveState();
-	      tabStore.emitChange();
-	      break;
 	    case _tab_actions.TabConstants.CREATE_TAB:
 	      var keys = Object.keys(storage.tabs);
 	      var lastKey = parseInt(keys[keys.length - 1]);
@@ -21837,19 +21832,25 @@
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.DESTROY_TAB:
-	      delete storage.tabs[action.tab];
 	      storage.tab = null;
+	      delete storage.tabs[action.tab];
+	      tabStore.saveState();
+	      tabStore.emitChange();
+	      break;
+	    case _tab_actions.TabConstants.VIEW_TAB:
+	      storage.tab = action.tab;
 	      tabStore.saveState();
 	      tabStore.emitChange();
 	      break;
 	    case _tab_actions.TabConstants.UPDATE_TAB:
-	      var _action$tab = action.tab,
-	          id = _action$tab.id,
-	          body = _action$tab.body;
+	      if (action.id) {
+	        var _action$tab = action.tab,
+	            id = _action$tab.id,
+	            body = _action$tab.body;
 	
-	      storage.tab = id;
-	      storage.tabs[id] = body;
-	      tabStore.saveState();
+	        storage.tabs[id] = body;
+	        tabStore.saveState();
+	      }
 	      break;
 	    default:
 	      break;
