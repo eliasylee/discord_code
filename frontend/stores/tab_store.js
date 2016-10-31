@@ -60,8 +60,8 @@ tabStore.dispatchToken = Dispatcher.register(action => {
       tabStore.emitChange();
       break;
     case TabConstants.UPDATE_TAB:
-      if (action.id) {
-        const { id, body } = action.tab;
+      const { id, body } = action.tab;
+      if (id) {
         storage.tabs[id] = body;
         tabStore.saveState();
       }
